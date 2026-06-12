@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import "./App.css";
@@ -18,23 +18,46 @@ function App() {
 
   // Chat State
   const [message, setMessage] = useState("");
-  const [receivedMessage, setReceivedMessage] = useState("");
-  
+  const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState(0);
+  const messagesEndRef = useRef(null);
   // Socket.IO Connection
+  // Socket.IO Connection
+useEffect(() => {
+  socket.on("connect", () => {
+    console.log("Connected:", socket.id);
+  });
+
+  const loadMessages = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/messages");
+      setMessages(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  loadMessages();
+
+  socket.on("receive_message", (data) => {
+    setMessages((prevMessages) => [...prevMessages, data]);
+  });
+
+  socket.on("online_users", (count) => {
+    setOnlineUsers(count);
+  });
+
+  return () => {
+    socket.off("receive_message");
+    socket.off("online_users");
+  };
+}, []);
+
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-    });
-
-    socket.on("receive_message", (data) => {
-      setReceivedMessage(data);
-    });
-
-    return () => {
-      socket.off("receive_message");
-    };
-  }, []);
-
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
   // Register
   const handleRegister = async () => {
     try {
@@ -78,12 +101,16 @@ function App() {
   };
 
   // Send Chat Message
-  const sendMessage = () => {
-    if (message.trim() !== "") {
-      socket.emit("send_message", message);
-      setMessage("");
-    }
-  };
+ const sendMessage = () => {
+  if (message.trim() === "") return;
+
+  socket.emit("send_message", {
+    sender: localStorage.getItem("username"),
+    text: message,
+  });
+
+  setMessage("");
+};
 
   // Logged In Screen
   if (loggedIn) {
@@ -94,31 +121,68 @@ function App() {
        <p className="welcome">
   👋 Welcome back, {localStorage.getItem("username")}!
 </p>
+<p className="online-users">
+  🟢 {onlineUsers} User{onlineUsers !== 1 ? "s" : ""} Online
+</p>
         <div className="message-row">
           <input
-            type="text"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-
+  type="text"
+  placeholder="Type a message..."
+  value={message}
+  onChange={(e) => setMessage(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  }}
+/>
           <button className="send-btn" onClick={sendMessage}>
             Send
           </button>
         </div>
 
+        
         <div className="chat-box">
-          <h3>💬 Latest Message</h3>
-          <p className="chat-message">
-            {receivedMessage || "No messages yet..."}
-          </p>
+  <h3>💬 Chat History</h3>
+
+  {messages.length === 0 ? (
+    <p className="chat-message">No messages yet...</p>
+  ) : (
+    messages.map((msg, index) => (
+      <div
+        key={index}
+        className={
+          msg.sender === localStorage.getItem("username")
+            ? "my-message"
+            : "other-message"
+        }
+      >
+        <div className="sender-name">
+          {msg.sender}
         </div>
+
+        <div>{msg.text}</div>
+
+        <div className="time-stamp">
+          {msg.timestamp
+            ? new Date(msg.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : ""}
+        </div>
+      </div>
+    ))
+  )}
+  <div ref={messagesEndRef}></div>
+</div>
 
         <button
           className="logout-btn"
           onClick={() => {
             localStorage.removeItem("token");
             localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("username");
             setLoggedIn(false);
           }}
         >

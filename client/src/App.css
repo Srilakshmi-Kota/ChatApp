@@ -170,3 +170,55 @@ input:focus {
   color: #888;
   font-size: 13px;
 }
+/* Chat History */
+.chat-box {
+  margin-top: 20px;
+  max-height: 350px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  background: #f7f8fc;
+  border-radius: 10px;
+}
+
+.my-message,
+.other-message {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.my-message {
+  align-self: flex-end;
+  background: #d9fdd3;
+  text-align: right;
+}
+
+.other-message {
+  align-self: flex-start;
+  background: #ffffff;
+  text-align: left;
+}
+
+.sender-name {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+.time-stamp {
+  font-size: 10px;
+  color: #777;
+  margin-top: 5px;
+}
+.online-users {
+  margin-top: 8px;
+  margin-bottom: 15px;
+  color: #28a745;
+  font-weight: 600;
+  font-size: 14px;
+}

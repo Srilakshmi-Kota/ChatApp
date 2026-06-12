@@ -9,7 +9,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 
 const User = require("./models/User");
-
+const Message = require("./models/Message");
 const app = express();
 const server = http.createServer(app);
 app.use(cors());
@@ -115,22 +115,57 @@ app.post("/login", async (req, res) => {
     });
   }
 });
-
+app.get("/messages", async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ timestamp: 1 });
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+let onlineUsers = 0;
 // =========================
 // Socket.IO
 // =========================
 io.on("connection", (socket) => {
   console.log("🟢 User Connected:", socket.id);
+  onlineUsers++;
+io.emit("online_users", onlineUsers);
+  socket.on("send_message", async (data) => {
+  console.log("📩 Message Received:", data);
 
-  socket.on("send_message", (data) => {
-    console.log("📩 Message Received:", data);
-
-    io.emit("receive_message", data);
+  const newMessage = new Message({
+    sender: data.sender,
+    text: data.text,
   });
+
+  await newMessage.save();
+
+  io.emit("receive_message", {
+    sender: data.sender,
+    text: data.text,
+    timestamp: newMessage.timestamp,
+  });
+});
 
   socket.on("disconnect", () => {
-    console.log("🔴 User Disconnected:", socket.id);
-  });
+  console.log("🔴 User Disconnected:", socket.id);
+
+  onlineUsers--;
+  io.emit("online_users", onlineUsers);
+});
+});
+app.get("/messages", async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ timestamp: 1 });
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 });
 
 // =========================
