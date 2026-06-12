@@ -32,3 +32,4 @@ A full-stack real-time chat application built using the MERN stack with secure J
    cd client && npm start
 <img width="1807" height="861" alt="image" src="https://github.com/user-attachments/assets/364f9522-bf0b-40b9-9b4e-8cd2af704468" />
 <img width="1530" height="749" alt="image" src="https://github.com/user-attachments/assets/37b8d657-6af1-4cc3-a6f7-7fd842da9659" />
+<img width="1340" height="865" alt="image" src="https://github.com/user-attachments/assets/476e62e7-39bc-4531-b5da-19cacc1f4f5e" />
