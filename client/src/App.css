@@ -161,9 +161,7 @@ input:focus {
   color: #222;
   word-wrap: break-word;
 }
-<p className="footer-text">
-  Built with ❤️ using React, Node.js, MongoDB & Socket.IO
-</p>
+
 .footer-text {
   text-align: center;
   margin-top: 20px;

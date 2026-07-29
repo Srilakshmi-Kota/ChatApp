@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import "./App.css";
-const socket = io("http://localhost:5000");
+const socket = io("https://chatapp-0buu.onrender.com");
 
 function App() {
   // Authentication State
@@ -30,7 +30,7 @@ useEffect(() => {
 
   const loadMessages = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/messages");
+      const res = await axios.get("https://chatapp-0buu.onrender.com/messages");
       setMessages(res.data);
     } catch (error) {
       console.log(error);
@@ -62,7 +62,7 @@ useEffect(() => {
   const handleRegister = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/register",
+        "https://chatapp-0buu.onrender.com/register",
         {
           username,
           email,
@@ -81,7 +81,7 @@ useEffect(() => {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/login",
+        "https://chatapp-0buu.onrender.com/login",
         {
           email,
           password,
@@ -188,6 +188,9 @@ useEffect(() => {
         >
           Logout
         </button>
+        <p className="footer-text">
+  Built with ❤️ using React, Node.js, MongoDB & Socket.IO
+</p>
       </div>
     </div>
   );
