@@ -12,6 +12,7 @@ const User = require("./models/User");
 const Message = require("./models/Message");
 const app = express();
 const server = http.createServer(app);
+
 app.use(cors());
 // Middleware
 app.use(express.json());
